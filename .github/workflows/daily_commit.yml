@@ -33,7 +33,7 @@ jobs:
             echo "Commit $i at $(date)" >> dummy_log.txt
             git add dummy_log.txt
             git commit -m "Auto-commit $i/$COMMITS: $(date +'%Y-%m-%d %H:%M:%S')"
-            sleep 1  # Adds slight delay between commits
+            sleep 5  # Adds slight delay between commits
           done
           
           # Push all commits
