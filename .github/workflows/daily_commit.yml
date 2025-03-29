@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # Critical permission
+  contents: write
 
 jobs:
   commit:
@@ -21,13 +21,21 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
-      - name: Make Auto-Commit
+      - name: Generate Random Commits
         run: |
-          # Create commit
-          echo "Auto-commit at $(date)" >> dummy_log.txt
-          git add dummy_log.txt
-          git commit -m "Auto-commit: $(date +'%Y-%m-%d %H:%M:%S')"
+          # Generate random number between 1-9
+          COMMITS=$(( $RANDOM % 9 + 1 ))
+          echo "Today's commits: $COMMITS"
           
-          # Push with proper authentication
+          # Create multiple commits
+          for (( i=1; i<=$COMMITS; i++ ))
+          do
+            echo "Commit $i at $(date)" >> dummy_log.txt
+            git add dummy_log.txt
+            git commit -m "Auto-commit $i/$COMMITS: $(date +'%Y-%m-%d %H:%M:%S')"
+            sleep 1  # Adds slight delay between commits
+          done
+          
+          # Push all commits
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git push origin main
