@@ -1,7 +1,7 @@
 name: Daily Auto-Commit
 on:
   schedule:
-    - cron: "0 0 * * *"  # Runs daily at midnight UTC
+    - cron: "0 1 * * *"  # Midnight UTC
   workflow_dispatch:
 
 permissions:
@@ -18,24 +18,22 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+          git config --global user.name "aaniket21"  # Case-sensitive!
+          git config --global user.email "aniket.kr2103@gmial.com"  # Must match GitHub email
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
-      - name: Generate Random Commits
+      - name: Make Commits
         run: |
-          # Generate random number between 1-9
+          # Generate 1-9 commits
           COMMITS=$(( $RANDOM % 9 + 1 ))
-          echo "Today's commits: $COMMITS"
+          echo "Today's commits: $COMMITS" >> commit_log.txt
           
-          # Create multiple commits
-          for (( i=1; i<=$COMMITS; i++ ))
-          do
+          for (( i=1; i<=$COMMITS; i++ )); do
             echo "Commit $i at $(date)" >> dummy_log.txt
-            git add dummy_log.txt
-            git commit -m "Auto-commit $i/$COMMITS: $(date +'%Y-%m-%d %H:%M:%S')"
-            sleep 5  # Adds slight delay between commits
+            git add dummy_log.txt commit_log.txt
+            git commit -m "Auto-commit $i/$COMMITS"
+            sleep 1
           done
           
-          # Push all commits
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git pull --rebase origin main  # Prevent conflicts
           git push origin main
